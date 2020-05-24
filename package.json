@@ -1,0 +1,25 @@
+{
+  "name": "@zebrajaeger/ws-value",
+  "version": "1.0.0",
+  "description": "Wrapper on top of ws for easy handling of distributed values",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "ts",
+    "ws",
+    "value",
+    "event"
+  ],
+  "author": "Lars Brandt",
+  "license": "LGPL-3.0-or-later",
+  "dependencies": {
+    "optional-typescript": "^1.4.1",
+    "rpc-websockets": "^5.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.3"
+  }
+}
