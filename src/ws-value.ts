@@ -21,7 +21,7 @@ import {None, Optional} from 'optional-typescript';
 
 export abstract class BasicValue<T> {
     protected value_: Optional<T> = None<T>();
-    private listeners_ = new Array<(value: Optional<T>) => void>()
+    private listeners_ = new Array<(value: T) => void>()
 
     get value(): Optional<T> {
         return this.value_;
@@ -33,7 +33,7 @@ export abstract class BasicValue<T> {
         return this.value_.valueOr(null!);
     };
 
-    onChange(cb: (value: Optional<T>) => void) {
+    onChange(cb: (value: T) => void) {
         this.listeners_.push(cb);
     }
 
