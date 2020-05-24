@@ -14,6 +14,7 @@
     "event"
   ],
   "author": "Lars Brandt",
+  "homepage": "https://github.com/zebrajaeger/ws-value",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "optional-typescript": "^1.4.1",
