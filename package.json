@@ -1,6 +1,6 @@
 {
   "name": "@zebrajaeger/ws-value",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Wrapper on top of ws for easy handling of distributed values",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
