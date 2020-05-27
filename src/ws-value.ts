@@ -20,26 +20,53 @@ import {Client, Server} from 'rpc-websockets';
 import {None, Optional} from 'optional-typescript';
 
 export abstract class BasicValue<T> {
-    protected value_: Optional<T> = None<T>();
-    private listeners_ = new Array<(value: T) => void>()
+    private value: Optional<T> = None<T>();
+    private changeListeners = new Array<(value: T) => void>()
+    private initListeners = new Array<(value: T) => void>()
+    private isInitialized = false;
 
-    get value(): Optional<T> {
-        return this.value_;
+    resetValue(){
+        this.setValue(undefined);
     }
 
     abstract setValue(v: T): void;
 
+    protected setValueInternal(v: T) {
+        this.value = new Optional<T>(v);
+        if (!this.isInitialized && this.value.hasValue) {
+            this.isInitialized = true;
+            this.propagateInit();
+        }
+    }
+
     getValue(): T {
-        return this.value_.valueOr(null!);
+        return this.value.valueOr(null!);
+    };
+
+    getValueOr(v: T): T {
+        return this.value.valueOr(v);
     };
 
     onChange(cb: (value: T) => void) {
-        this.listeners_.push(cb);
+        this.changeListeners.push(cb);
     }
 
-    protected propagateValue() {
+    onInit(cb: (value: T) => void) {
+        if (this.isInitialized) {
+            cb(this.getValue());
+        } else {
+            this.initListeners.push(cb);
+        }
+    }
+
+    protected propagateChange() {
         const v = this.getValue();
-        this.listeners_.forEach(listener => listener(v));
+        this.changeListeners.forEach(listener => listener(v));
+    }
+
+    protected propagateInit() {
+        const v = this.getValue();
+        this.initListeners.forEach(listener => listener(v));
     }
 }
 
@@ -48,20 +75,17 @@ export class ServerValue<T> extends BasicValue<T> {
         super();
         server.event(name);
         server.register('get-' + name, () => {
-            console.log(`ServerValue get-${name}()`);
-            return this.value_.valueOr(null!);
+            return this.getValue();
         })
         server.register('set-' + name, (params) => {
-            console.log(`ServerValue set-${name}('${params.value}')`);
             this.setValue(params.value);
-            this.propagateValue();
+            // this.propagateChange();
         })
     }
 
     setValue(v: T): void {
-        console.log(`ServerValue setValue('${this.name}', '${v}')`);
-        this.value_ = new Optional<T>(v);
-        // notify clients
+        this.setValueInternal(v);
+        this.propagateChange();
         this.server.emit(this.name, v);
     }
 }
@@ -71,18 +95,15 @@ export class ClientValue<T> extends BasicValue<T> {
         super();
         client.subscribe(name);
         client.on(name, value => {
-            console.log(`ClientValue on-${name}('${value}')`);
-            this.value_ = new Optional(value);
-            this.propagateValue();
+            this.setValueInternal(<T>value);
+            this.propagateChange();
         });
         client.call('get-' + this.name).then(value => {
-            console.log(`ClientValue get-${this.name}('${value}')`);
-            this.value_ = new Optional<T>(<T>value);
+            this.setValueInternal(<T>value);
         });
     }
 
     setValue(value: T): void {
-        console.log(`ClientValue set-${this.name}('${value}')`);
         this.client.call('set-' + this.name, {value});
     }
 }

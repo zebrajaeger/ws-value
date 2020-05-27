@@ -1,12 +1,14 @@
 {
   "name": "@zebrajaeger/ws-value",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "Wrapper on top of ws for easy handling of distributed values",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/ijestndex.d.ts",
   "scripts": {
+    "test": "jest",
     "build": "tsc",
-    "deploy": "npm publish --access public"
+    "deploy": "npm publish --access public",
+    "dev": "ts-node-dev --respawn --transpileOnly ./src/ws-value.test.ts"
   },
   "keywords": [
     "ts",
@@ -16,12 +18,20 @@
   ],
   "author": "Lars Brandt",
   "homepage": "https://github.com/zebrajaeger/ws-value",
+  "repository": "https://github.com/zebrajaeger/ws-value",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "optional-typescript": "^1.4.1",
     "rpc-websockets": "^5.1.1"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@types/log4js": "^2.3.5",
+    "get-port": "^5.1.1",
+    "jest": "^26.0.1",
+    "log4js": "^6.3.0",
+    "ts-jest": "^26.0.0",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.3"
   }
 }
