@@ -1,9 +1,9 @@
 {
   "name": "@zebrajaeger/ws-value",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Wrapper on top of ws for easy handling of distributed values",
   "main": "./dist/index.js",
-  "types": "./dist/ijestndex.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc",
