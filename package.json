@@ -1,6 +1,6 @@
 {
   "name": "@zebrajaeger/ws-value",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "Wrapper on top of ws for easy handling of distributed values",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -8,7 +8,8 @@
     "test": "jest",
     "build": "tsc",
     "deploy": "tsc && npm publish --access public",
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/ws-value.test.ts"
+    "dev1": "ts-node-dev --respawn --transpileOnly ./src/ws-value.test",
+    "dev2": "ts-node-dev --respawn --transpileOnly ./src/deep-equal.test.ts"
   },
   "keywords": [
     "ts",
@@ -25,13 +26,15 @@
     "rpc-websockets": "^5.1.1"
   },
   "devDependencies": {
+    "@types/deep-equal": "^1.0.1",
     "@types/jest": "^25.2.3",
     "@types/log4js": "^2.3.5",
+    "deep-equal": "^2.0.3",
     "get-port": "^5.1.1",
     "jest": "^26.0.1",
     "log4js": "^6.3.0",
     "ts-jest": "^26.0.0",
-    "ts-node": "^8.10.1",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.9.3"
   }
 }

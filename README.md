@@ -91,6 +91,14 @@ status.onChange(newStatus=>{
 });
 ```
 
+#### Change equality behavior using deep-equal instead of equal (===) operator
+
+```typescript
+import deepEqual = require('deep-equal');
+
+const status = new ServerValue<Status>(server, 'counter', (o1, o2) => deepEqual(o1, o2));
+```
+
 ## Overview 
 ![Overview](./doc/overview.png)
 

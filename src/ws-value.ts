@@ -109,7 +109,10 @@ export abstract class BasicValue<T> {
  * The setValue function changes the local value (server side) directly and propagate it to all clients.
  */
 export class ServerValue<T> extends BasicValue<T> {
-    constructor(private server: Server, private name: string) {
+
+    constructor(private server: Server,
+                private name: string,
+                public isEqual: (o1: T, o2: T) => boolean = (o1, o2) => o1 === o2) {
         super();
         server.event(name);
         server.register('get-' + name, () => {
@@ -117,14 +120,16 @@ export class ServerValue<T> extends BasicValue<T> {
         })
         server.register('set-' + name, (params) => {
             this.setValue(params.value);
-            // this.propagateChange();
         })
     }
 
     setValue(v: T): void {
-        this.setLocalValue(v);
-        this.propagateChange();
-        this.server.emit(this.name, v);
+        // trigger change process if value has been changed. This prevents sending the same value multible times
+        if (!this.isEqual(this.getValue(), v)) {
+            this.setLocalValue(v);
+            this.propagateChange();
+            this.server.emit(this.name, v);
+        }
     }
 }
 
@@ -143,6 +148,7 @@ export class ClientValue<T> extends BasicValue<T> {
         });
         client.call('get-' + this.name).then(value => {
             this.setLocalValue(<T>value);
+            this.propagateChange();
         });
     }
 
