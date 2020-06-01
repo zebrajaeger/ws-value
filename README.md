@@ -2,8 +2,6 @@
 
 Distribute values via websocket
 
-![Overview](./doc/overview.png)
-
 ## Example in TS
 
 ### MyInterface
@@ -92,5 +90,8 @@ status.onChange(newStatus=>{
     console.log('change', newStatus);
 });
 ```
+
+## Overview 
+![Overview](./doc/overview.png)
 
 
