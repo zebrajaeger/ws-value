@@ -96,7 +96,11 @@ status.onChange(newStatus=>{
 ```typescript
 import deepEqual = require('deep-equal');
 
+// using custom function within lambda
 const status = new ServerValue<Status>(server, 'counter', (o1, o2) => deepEqual(o1, o2));
+
+// or more simple: deepEqual function as parameter
+const status = new ServerValue<Status>(server, 'counter', deepEqual);
 ```
 
 ## Overview 

@@ -44,7 +44,7 @@ function startup() {
 
         server = new Server({port, host: '127.0.0.1'});
         // !! Servervalue with custom isEqual function !!!
-        serverValue = new ServerValue<MyComplexObject>(server, 'foo', (o1, o2) => deepEqual(o1, o2));
+        serverValue = new ServerValue<MyComplexObject>(server, 'foo', deepEqual);
         serverValue.onInit(v => {
             LOG.debug(`ServerValue EVENT: initial value is '${v}'`);
         });
