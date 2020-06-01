@@ -25,13 +25,24 @@ export abstract class BasicValue<T> {
     private initListeners = new Array<(value: T) => void>()
     private isInitialized = false;
 
-    resetValue(){
+    /**
+     * set value to undefined
+     */
+    resetValue() {
         this.setValue(undefined);
     }
 
+    /**
+     * Set new Value see ClientValue and ServerValue
+     * @param v the new Value
+     */
     abstract setValue(v: T): void;
 
-    protected setValueInternal(v: T) {
+    /**
+     * Set local value to value and notify the init listeners (but NOT the change listeners!).
+     * @param v the new Value
+     */
+    protected setLocalValue(v: T) {
         this.value = new Optional<T>(v);
         if (!this.isInitialized && this.value.hasValue) {
             this.isInitialized = true;
@@ -39,18 +50,34 @@ export abstract class BasicValue<T> {
         }
     }
 
+    /**
+     * get local stored value
+     */
     getValue(): T {
         return this.value.valueOr(null!);
     };
 
+    /**
+     * get local stored value or - if unset - the provided value
+     */
     getValueOr(v: T): T {
         return this.value.valueOr(v);
     };
 
+    /**
+     * called if values has been changed
+     * @param cb
+     */
     onChange(cb: (value: T) => void) {
         this.changeListeners.push(cb);
     }
 
+    /**
+     * Called once.
+     * If not initialized the callback function will called when initialized.
+     * If already initialized, the callback function is called immediately.
+     * @param cb
+     */
     onInit(cb: (value: T) => void) {
         if (this.isInitialized) {
             cb(this.getValue());
@@ -59,17 +86,28 @@ export abstract class BasicValue<T> {
         }
     }
 
+    /**
+     * send notification to all change listeners.
+     */
     protected propagateChange() {
         const v = this.getValue();
         this.changeListeners.forEach(listener => listener(v));
     }
 
+    /**
+     * send notification to all init listeners.
+     */
     protected propagateInit() {
         const v = this.getValue();
         this.initListeners.forEach(listener => listener(v));
     }
 }
 
+/**
+ * The Value proxy for server-side use. This is the master of the data model.
+ * Clients sending value-change-requests to this ServerValue. After value change of the server-value, the change is propagated up to all clients.
+ * The setValue function changes the local value (server side) directly and propagate it to all clients.
+ */
 export class ServerValue<T> extends BasicValue<T> {
     constructor(private server: Server, private name: string) {
         super();
@@ -84,22 +122,27 @@ export class ServerValue<T> extends BasicValue<T> {
     }
 
     setValue(v: T): void {
-        this.setValueInternal(v);
+        this.setLocalValue(v);
         this.propagateChange();
         this.server.emit(this.name, v);
     }
 }
 
+/**
+ * The Value proxy for client-side use. This is the slave of the data model.
+ * The setValue function does not set the local value, it only makes a call to server to change the value.
+ * If the server changes its value to the new one, the server propagates it back - up to this client value.
+ */
 export class ClientValue<T> extends BasicValue<T> {
     constructor(private client: Client, private name: string) {
         super();
         client.subscribe(name);
         client.on(name, value => {
-            this.setValueInternal(<T>value);
+            this.setLocalValue(<T>value);
             this.propagateChange();
         });
         client.call('get-' + this.name).then(value => {
-            this.setValueInternal(<T>value);
+            this.setLocalValue(<T>value);
         });
     }
 
