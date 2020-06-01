@@ -139,20 +139,50 @@ export class ServerValue<T> extends BasicValue<T> {
  * If the server changes its value to the new one, the server propagates it back - up to this client value.
  */
 export class ClientValue<T> extends BasicValue<T> {
+    private pendingValue: T = null;
+
     constructor(private client: Client, private name: string) {
         super();
-        client.subscribe(name);
-        client.on(name, value => {
-            this.setLocalValue(<T>value);
-            this.propagateChange();
-        });
-        client.call('get-' + this.name).then(value => {
-            this.setLocalValue(<T>value);
-            this.propagateChange();
-        });
+        client.on('open', () => {
+            // subscribe for server value.
+            client.subscribe(name);
+            client.on(name, value => {
+                this.setLocalValue(<T>value);
+                this.propagateChange();
+            });
+
+            // if connection has been stopped, the setValue puts the new value into pendingValue instead sending it.
+            // Because we have a connection, we send the pending value
+            if (this.pendingValue !== null) {
+                this.sendValueToServer(this.pendingValue);
+                this.pendingValue = null;
+            } else {
+                // no pending value.
+                // Request active the current value because we don't want to wait until someone sets a new value on server
+                client.call('get-' + this.name).then(value => {
+                    this.setLocalValue(<T>value);
+                    this.propagateChange();
+                });
+            }
+        })
+    }
+
+    /**
+     * dirty hack to get state of client because it is private in TS definition
+     */
+    isClientReady(): boolean {
+        return (<any>this.client).ready;
+    }
+
+    sendValueToServer(value: T) {
+        this.client.call('set-' + this.name, {value});
     }
 
     setValue(value: T): void {
-        this.client.call('set-' + this.name, {value});
+        if (this.isClientReady()) {
+            this.sendValueToServer(value);
+        } else {
+            this.pendingValue = value;
+        }
     }
 }
