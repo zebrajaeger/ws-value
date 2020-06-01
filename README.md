@@ -2,13 +2,13 @@
 
 Distribute values via websocket
 
-![Overview](./doc/overview.png | width=100px)
+![Overview](./doc/overview.png)
 
 ## Example in TS
 
 ### MyInterface
  
-####Common stuff for Client and server 
+#### Common stuff for Client and server 
 
 ```typescript
 // complex object (may have sub-objects but we keep it simple)
