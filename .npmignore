@@ -1,3 +1,13 @@
 .idea
-src
+
+**/*.test.ts
+**/*.test.d.ts
+**/*.test.js
+
+doc/*.odg
+
 tsconfig.json
+yarn.lock
+jest.config.js
+tsconfig.json
+tslint.json
