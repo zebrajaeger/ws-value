@@ -107,3 +107,10 @@ const status = new ServerValue<Status>(server, 'counter', deepEqual);
 ![Overview](./doc/overview.png)
 
 
+## Release nodes
+
+## v1.1.3
+
+- Start with release notes in readme
+- remove unneeded files from deployed package to keep it small
+- reduce image size
